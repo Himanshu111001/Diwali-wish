@@ -398,21 +398,21 @@
     /* Buttons & Interactive Controls */
     .actions {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
+      justify-content: center;
+      margin-top: 22px;
       width: 100%;
     }
 
     .btn {
-      font: 600 12.5px 'DM Sans', sans-serif;
-      letter-spacing: 0.06em;
+      font: 600 13px 'DM Sans', sans-serif;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 14px 28px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
       width: 100%;
+      max-width: 320px;
       min-height: 48px;
       display: inline-flex;
       align-items: center;
@@ -430,19 +430,6 @@
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 28px rgba(229, 168, 75, 0.55);
-    }
-
-    .btn-secondary {
-      background: rgba(56, 17, 23, 0.85);
-      color: #fae0b0;
-      border: 1px solid rgba(220, 166, 80, 0.55);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(75, 23, 31, 0.95);
-      border-color: #f7ce79;
-      transform: translateY(-2px);
     }
 
     .btn:active {
@@ -517,13 +504,6 @@
       .frame {
         width: min(100%, 680px);
         padding: 44px 55px 38px;
-      }
-      .actions {
-        flex-direction: row;
-        gap: 12px;
-      }
-      .actions .btn {
-        flex: 1;
       }
       .hindi {
         font-size: 52px;
@@ -697,10 +677,9 @@
         <div class="signature">With warmest wishes,</div>
         <div class="name">Himanshu Shishodia</div>
 
-        <!-- Action Buttons -->
+        <!-- Action Button -->
         <div class="actions">
           <button class="btn btn-primary" id="celebrateBtn">✦ Celebrate Diwali</button>
-          <button class="btn btn-secondary" id="shareWhatsAppBtn">Share on WhatsApp ↗</button>
         </div>
 
         <p class="hint">Tap anywhere to illuminate the night sky ✨</p>
@@ -960,17 +939,6 @@
         }, i * 140);
       }
       showToast('✨ Let the festival of lights sparkle! Happy Diwali! ✨');
-    });
-
-    // -------------------------------------------------------------
-    // 6. Direct WhatsApp Share (Exclusive from Himanshu Shishodia)
-    // -------------------------------------------------------------
-    document.getElementById('shareWhatsAppBtn').addEventListener('click', () => {
-      const shareUrl = 'https://diwaliwishes2026.vercel.app';
-      const message = `॥ शुभ दीपावली ॥ 🪔✨\n\nMay your home glow with happiness, your heart shine with hope, and your life sparkle with countless blessings.\n\nWishing you and your family health, peace and abundance this Diwali season.\n\nOpen your Diwali card here:\n👉 ${shareUrl}\n\n— With warmest wishes, Himanshu Shishodia`;
-      
-      const waUrl = 'https://wa.me/?text=' + encodeURIComponent(message);
-      window.open(waUrl, '_blank', 'noopener,noreferrer');
     });
 
     // -------------------------------------------------------------
