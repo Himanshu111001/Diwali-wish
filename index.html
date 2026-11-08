@@ -741,12 +741,10 @@
         targetY: y - (110 + Math.random() * Math.min(320, h * 0.45)),
         color: festiveColors[Math.floor(Math.random() * festiveColors.length)]
       });
-      playCrackleSound(0.12, 400);
     }
 
     function burstSparks(x, y, color, power = 1) {
       const count = isReduced ? 25 : Math.floor(60 + Math.random() * 40);
-      playBurstSound();
 
       for (let i = 0; i < count; i++) {
         const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
@@ -821,81 +819,25 @@
     requestAnimationFrame(renderLoop);
 
     // -------------------------------------------------------------
-    // 3. Web Audio API Sound Synthesizer (Instant 0ms Feedback)
-    // -------------------------------------------------------------
-    let audioCtx = null;
-    function getAudioCtx() {
-      if (!audioCtx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) audioCtx = new AudioContext();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      return audioCtx;
-    }
-
-    function playBurstSound() {
-      if (isMuted) return;
-      try {
-        const actx = getAudioCtx();
-        if (!actx) return;
-
-        const osc = actx.createOscillator();
-        const gain = actx.createGain();
-
-        const baseFreq = 220 + Math.random() * 280;
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(baseFreq, actx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(60, actx.currentTime + 0.28);
-
-        gain.gain.setValueAtTime(0.2, actx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.28);
-
-        osc.connect(gain);
-        gain.connect(actx.destination);
-
-        osc.start();
-        osc.stop(actx.currentTime + 0.29);
-      } catch (err) {}
-    }
-
-    function playCrackleSound(vol = 0.08, freq = 350) {
-      if (isMuted) return;
-      try {
-        const actx = getAudioCtx();
-        if (!actx) return;
-
-        const osc = actx.createOscillator();
-        const gain = actx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, actx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, actx.currentTime + 0.15);
-
-        gain.gain.setValueAtTime(vol, actx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.15);
-
-        osc.connect(gain);
-        gain.connect(actx.destination);
-
-        osc.start();
-        osc.stop(actx.currentTime + 0.16);
-      } catch (err) {}
-    }
-
-    // -------------------------------------------------------------
-    // 4. Background Ambient Audio & Sound Toggle
+    // 3. Audio Controls (Exclusively User's Fireworks MP3)
     // -------------------------------------------------------------
     const bgAudio = document.getElementById('realFireworks');
     const soundBtn = document.getElementById('soundBtn');
     const soundIcon = document.getElementById('soundIcon');
-    let isMuted = true;
+    let isMuted = false;
 
-    bgAudio.volume = 0.55;
+    bgAudio.volume = 0.65;
+
+    function playUserAudio() {
+      if (!isMuted && bgAudio.paused) {
+        bgAudio.play().then(() => {
+          soundIcon.textContent = '🔊';
+          soundBtn.setAttribute('aria-label', 'Mute sound');
+        }).catch(() => {});
+      }
+    }
 
     function toggleAudio() {
-      getAudioCtx();
       isMuted = !isMuted;
       if (isMuted) {
         bgAudio.pause();
@@ -903,34 +845,32 @@
         soundBtn.setAttribute('aria-label', 'Enable sound');
         showToast('Sound muted 🔇');
       } else {
-        bgAudio.play().catch(() => {});
-        soundIcon.textContent = '🔊';
-        soundBtn.setAttribute('aria-label', 'Mute sound');
-        showToast('Festive sound active 🔊');
+        bgAudio.play().then(() => {
+          soundIcon.textContent = '🔊';
+          soundBtn.setAttribute('aria-label', 'Mute sound');
+          showToast('Festive sound active 🔊');
+        }).catch(() => {});
       }
     }
     soundBtn.addEventListener('click', toggleAudio);
 
-    function initialUnlock() {
-      getAudioCtx();
-      window.removeEventListener('pointerdown', initialUnlock);
-      window.removeEventListener('keydown', initialUnlock);
-    }
-    window.addEventListener('pointerdown', initialUnlock, { once: true });
-    window.addEventListener('keydown', initialUnlock, { once: true });
+    // Initial gesture unlock
+    window.addEventListener('pointerdown', playUserAudio, { once: true });
+    window.addEventListener('keydown', playUserAudio, { once: true });
 
-    // Tap anywhere for instant fireworks
+    // Tap anywhere triggers visual fireworks and ensures the MP3 is playing
     window.addEventListener('pointerdown', (e) => {
       if (e.target.closest('button')) return;
+      playUserAudio();
       burstSparks(e.clientX, e.clientY, festiveColors[Math.floor(Math.random() * festiveColors.length)], 1.15);
     });
 
     // -------------------------------------------------------------
-    // 5. Grand Celebration Choreography
+    // 4. Grand Celebration Choreography
     // -------------------------------------------------------------
     document.getElementById('celebrateBtn').addEventListener('click', () => {
-      getAudioCtx();
       if (isMuted) toggleAudio();
+      else playUserAudio();
 
       for (let i = 0; i < 14; i++) {
         setTimeout(() => {
