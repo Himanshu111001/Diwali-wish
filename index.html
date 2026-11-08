@@ -581,8 +581,8 @@
   </div>
 
   <!-- Audio Toggle Button -->
-  <button class="sound-btn" id="soundBtn" aria-label="Enable festive sound" title="Sound on/off">
-    <span id="soundIcon">🔊</span>
+  <button class="sound-btn" id="soundBtn" aria-label="Toggle festive sound" title="Sound on/off">
+    <span id="soundIcon">🔇</span>
   </button>
 
   <!-- Main Festive Container -->
@@ -819,25 +819,32 @@
     requestAnimationFrame(renderLoop);
 
     // -------------------------------------------------------------
-    // 3. Audio Controls (Exclusively User's Fireworks MP3)
+    // 3. Audio Controls (Activated on "Celebrate Diwali")
     // -------------------------------------------------------------
     const bgAudio = document.getElementById('realFireworks');
     const soundBtn = document.getElementById('soundBtn');
     const soundIcon = document.getElementById('soundIcon');
-    let isMuted = false;
+    let hasCelebrated = false;
+    let isMuted = true;
 
     bgAudio.volume = 0.65;
 
-    function playUserAudio() {
-      if (!isMuted && bgAudio.paused) {
-        bgAudio.play().then(() => {
-          soundIcon.textContent = '🔊';
-          soundBtn.setAttribute('aria-label', 'Mute sound');
-        }).catch(() => {});
-      }
+    function startAudio() {
+      isMuted = false;
+      bgAudio.play().then(() => {
+        soundIcon.textContent = '🔊';
+        soundBtn.setAttribute('aria-label', 'Mute sound');
+      }).catch(() => {});
     }
 
     function toggleAudio() {
+      if (!hasCelebrated) {
+        hasCelebrated = true;
+        startAudio();
+        showToast('Festive sound active 🔊');
+        return;
+      }
+
       isMuted = !isMuted;
       if (isMuted) {
         bgAudio.pause();
@@ -854,23 +861,29 @@
     }
     soundBtn.addEventListener('click', toggleAudio);
 
-    // Initial gesture unlock
-    window.addEventListener('pointerdown', playUserAudio, { once: true });
-    window.addEventListener('keydown', playUserAudio, { once: true });
-
-    // Tap anywhere triggers visual fireworks and ensures the MP3 is playing
+    // Tap anywhere creates visual fireworks - SILENT until Celebrate Diwali is clicked!
     window.addEventListener('pointerdown', (e) => {
       if (e.target.closest('button')) return;
-      playUserAudio();
       burstSparks(e.clientX, e.clientY, festiveColors[Math.floor(Math.random() * festiveColors.length)], 1.15);
+
+      // Only resume audio if Celebrate Diwali has already been activated and not muted
+      if (hasCelebrated && !isMuted && bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+      }
     });
 
     // -------------------------------------------------------------
-    // 4. Grand Celebration Choreography
+    // 4. Grand Celebration Choreography (First click unlocks audio!)
     // -------------------------------------------------------------
     document.getElementById('celebrateBtn').addEventListener('click', () => {
-      if (isMuted) toggleAudio();
-      else playUserAudio();
+      if (!hasCelebrated) {
+        hasCelebrated = true;
+        startAudio();
+      } else if (isMuted) {
+        toggleAudio();
+      } else if (bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+      }
 
       for (let i = 0; i < 14; i++) {
         setTimeout(() => {
