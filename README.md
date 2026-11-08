@@ -2,6 +2,8 @@
 
 A radiant, mobile-first Diwali greeting web app featuring traditional glowing terracotta diyas, GPU-accelerated canvas fireworks, ambient audio, synthesized sound effects, and personalized WhatsApp sharing.
 
+👉 **Live Demo:** [https://diwaliwishes2026.vercel.app](https://diwaliwishes2026.vercel.app)
+
 ![Diwali Greeting Preview](https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1200&q=80)
 
 ---
