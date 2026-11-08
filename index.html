@@ -436,16 +436,6 @@
       transform: scale(0.97);
     }
 
-    .hint {
-      font-size: 10px;
-      line-height: 1.5;
-      letter-spacing: 0.12em;
-      color: #d6ad7a;
-      margin-top: 14px;
-      text-transform: uppercase;
-      opacity: 0.88;
-    }
-
     /* Toast Notification */
     .toast {
       position: fixed;
@@ -681,8 +671,6 @@
         <div class="actions">
           <button class="btn btn-primary" id="celebrateBtn">✦ Celebrate Diwali</button>
         </div>
-
-        <p class="hint">Tap anywhere to illuminate the night sky ✨</p>
       </footer>
     </section>
   </main>
@@ -715,6 +703,7 @@
     let rockets = [];
     let sparks = [];
     let lastAutoLaunch = 0;
+    let hasCelebrated = false;
     const isReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function resize() {
@@ -769,7 +758,7 @@
 
       ctx.globalCompositeOperation = 'lighter';
 
-      if (!isReduced && t - lastAutoLaunch > 1600) {
+      if (!isReduced && hasCelebrated && t - lastAutoLaunch > 1600) {
         launchRocket(w * (0.15 + Math.random() * 0.7), h + 10, 1);
         lastAutoLaunch = t;
       }
@@ -824,7 +813,6 @@
     const bgAudio = document.getElementById('realFireworks');
     const soundBtn = document.getElementById('soundBtn');
     const soundIcon = document.getElementById('soundIcon');
-    let hasCelebrated = false;
     let isMuted = true;
 
     bgAudio.volume = 0.65;
@@ -861,13 +849,12 @@
     }
     soundBtn.addEventListener('click', toggleAudio);
 
-    // Tap anywhere creates visual fireworks - SILENT until Celebrate Diwali is clicked!
+    // Tap fireworks interactiveness starts ONLY after Celebrate Diwali is clicked!
     window.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('button')) return;
+      if (!hasCelebrated || e.target.closest('button')) return;
       burstSparks(e.clientX, e.clientY, festiveColors[Math.floor(Math.random() * festiveColors.length)], 1.15);
 
-      // Only resume audio if Celebrate Diwali has already been activated and not muted
-      if (hasCelebrated && !isMuted && bgAudio.paused) {
+      if (!isMuted && bgAudio.paused) {
         bgAudio.play().catch(() => {});
       }
     });
